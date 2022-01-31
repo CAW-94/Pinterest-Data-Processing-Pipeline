@@ -40,13 +40,3 @@ findspark.init()
 
 access_id=
 access_key=
-
-sc=spark.sparkContext
-
-hadoop_conf=sc._jsc.hadoopConfiguration()
-hadoop_conf.set("fs.s3n.impl", "org.apache.hadoop.fs.s3native.NativeS3FileSystem")
-hadoop_conf.set("fs.s3n.awsAccessKeyId", access_id)
-hadoop_conf.set("fs.s3n.awsSecretAccessKey", access_key)
-
-df = spark.read.json('s3://aicore-pintrestproject/pintrest_message_value_jsons/')
-df.show()
