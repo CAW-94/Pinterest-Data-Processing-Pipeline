@@ -31,12 +31,13 @@ class S3Connector():
         content_object = self.s3_resource.Object('aicore-pintrestproject', f'pintrest_message_value_jsons/pintrest{start_json}.json')
         file_content = content_object.get()['Body'].read().decode('utf-8')
         json_content = json.loads(file_content)
-        s3_df = self.spark.read.json(sc.parallelize([json_content]))
+        s3_df = self.spark.read.json(self.sc.parallelize([json_content]))
 
         obj = start_json + 1
+        max_obj = start_json + n_jsons
 
 
-        while obj < :
+        while obj < max_obj:
             content_object = self.s3_resource.Object("aicore-pintrestproject", f"pintrest_message_value_jsons/pintrest{obj}.json")
             file_content = (content_object.get()['Body'].read())
             json_content = str(json.loads(file_content))
@@ -44,19 +45,11 @@ class S3Connector():
             json_content = json_content.replace("'",'"')
             json_content = json_content.encode('utf_8').decode('utf_8')
             print(f'appending json {obj}')
-            s3_df = s3_df.unionByName(spark.read.json(sc.parallelize([json_content])),allowMissingColumns=True)
+            s3_df = s3_df.unionByName(self.spark.read.json(self.sc.parallelize([json_content])),allowMissingColumns=True)
             obj += 1
+        self.sc.stop()
+        return s3_df
 
-
-        # # # s3_df = spark.read.json(sc.parallelize([json_content]))
-        s3_df.show()
-        #s3_df.show()
-        s3_df_clean = s3_df.drop(s3_df._corrupt_record)
-        s3_df_clean = s3_df_clean.dropna()
-        #s3_df_clean = s3_df_clean.drop(" _corrupt_record")
-        s3_df_clean.show()
-        # # s3_df.printSchema()
-        # # # s3_df_a.show()
 
 
 
