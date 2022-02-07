@@ -8,41 +8,31 @@ import json
 import aws_session
 findspark.init()
 
+class S3Connector():
+
+    def __init__(self):
 
 #----------------APACHE CONFIGURATIONS--------------
-os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.amazonaws:aws-java-sdk:1.7.4,org.apache.hadoop:hadoop-aws:2.7.3 pyspark-shell'
+    os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.amazonaws:aws-java-sdk:1.7.4,org.apache.hadoop:hadoop-aws:2.7.3 pyspark-shell'
 
-#---------------spark--------------
-conf = (
-    SparkConf()
-    .set('spark.executor.extraJavaOptions','-Dcom.amazonaws.services.s3.enableV4=true')
-    .set('spark.driver.extraJavaOptions','-Dcom.amazonaws.services.s3.enableV4=true')
-    .setAppName('pyspark_aws')
-    .setMaster(f"local[{multiprocessing.cpu_count()}]")
-    .setIfMissing("spark.executor.memory", "6g")
-        )
-        
+    #---------------spark--------------
+    conf = (
+        SparkConf()
+        .set('spark.executor.extraJavaOptions','-Dcom.amazonaws.services.s3.enableV4=true')
+        .set('spark.driver.extraJavaOptions','-Dcom.amazonaws.services.s3.enableV4=true')
+        .setAppName('pyspark_aws')
+        .setMaster(f"local[{multiprocessing.cpu_count()}]")
+        .setIfMissing("spark.executor.memory", "2g")
+            )
+            
 
-sc=SparkContext(conf=conf)
-sc.setSystemProperty('com.amazonaws.services.s3.enableV4', 'true')
-spark=SparkSession(sc)
-#--------------hadoop--------------
-#commented out as direct connection not possible
-
-# hadoopConf = sc._jsc.hadoopConfiguration()
-# hadoopConf.set('fs.s3a.access.key', accessKeyId)
-# hadoopConf.set('fs.s3a.secret.key', secretAccessKey)
-# hadoopConf.set('fs.s3a.endpoint', 's3-eu-west-1.amazonaws.com')
-# hadoopConf.set('fs.s3a.impl', 'org.apache.hadoop.fs.s3a.S3AFileSystem')
-# hadoopConf.set('fs.s3a.multipart.size', '419430400')
-# hadoopConf.set('fs.s3a.multipart.threshold', '2097152000')
-# hadoopConf.set('fs.s3a.connection.maximum', '500')
-# hadoopConf.set('s3a.connection.timeout', '600000')
-
-
-#----------BOTO3 SET UP-------------
+    sc=SparkContext(conf=conf)
+    sc.setSystemProperty('com.amazonaws.services.s3.enableV4', 'true')
+    spark=SparkSession(sc)
 
 s3_resource = aws_session.session.resource('s3')
+
+def get_jsons()
 
 content_object = s3_resource.Object('aicore-pintrestproject', 'pintrest_message_value_jsons/pintrest1.json')
 file_content = content_object.get()['Body'].read().decode('utf-8')
@@ -69,7 +59,6 @@ while obj < 51:
 end = time.time()
 print(end - start)
 
-#%%
 # # # s3_df = spark.read.json(sc.parallelize([json_content]))
 s3_df.show()
 #s3_df.show()
