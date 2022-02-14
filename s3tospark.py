@@ -50,6 +50,11 @@ class S3Connector():
         self.sc.stop()
         return s3_df
 
+class HBaseConnector():
+    
+    def __init__(self):
+        os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.hortonworks:shc-core:1.1.1-2.1-s_2.11'
+    
 
 
 
