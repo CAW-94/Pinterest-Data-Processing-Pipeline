@@ -11,7 +11,7 @@ findspark.init()
 class S3Connector():
 
     def __init__(self):
-        os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.amazonaws:aws-java-sdk:1.7.4,org.apache.hadoop:hadoop-aws:2.7.3 pyspark-shell'
+        os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.amazonaws:aws-java-sdk:1.7.4,org.apache.hadoop:hadoop-aws:2.7.3 pyspark-shell com.hortonworks:shc-core:1.1.1-2.1-s_2.11 --repositories http://repo.hortonworks.com/content/groups/public/'
 
         conf = (
         SparkConf()
@@ -41,20 +41,22 @@ class S3Connector():
             content_object = self.s3_resource.Object("aicore-pintrestproject", f"pintrest_message_value_jsons/pintrest{obj}.json")
             file_content = (content_object.get()['Body'].read())
             json_content = str(json.loads(file_content))
-            print(json_content)
             json_content = json_content.replace("'",'"')
             json_content = json_content.encode('utf_8').decode('utf_8')
-            print(f'appending json {obj}')
             s3_df = s3_df.unionByName(self.spark.read.json(self.sc.parallelize([json_content])),allowMissingColumns=True)
             obj += 1
-        self.sc.stop()
         return s3_df
+
+    def close_spark(self):
+    self.sc.stop()
+    print('Spark stopped')
 
 class HBaseConnector():
     
     def __init__(self):
         os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.hortonworks:shc-core:1.1.1-2.1-s_2.11'
     
+
 
 
 
